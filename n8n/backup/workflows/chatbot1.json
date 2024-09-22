@@ -23,7 +23,16 @@
     {
       "parameters": {
         "dataType": "binary",
-        "options": {}
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "sessionId",
+                "value": "={{ $('When chat message received').item.json.sessionId }}"
+              }
+            ]
+          }
+        }
       },
       "id": "2a7cfd74-3f01-40f4-9378-9f4492220b0b",
       "name": "Default Data Loader",
@@ -68,7 +77,10 @@
       }
     },
     {
-      "parameters": {},
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Qdrant Vector Store').item.json.metadata.sessionId }}"
+      },
       "id": "22cd1263-1181-4ca1-9913-71b616d7414e",
       "name": "Postgres Chat Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
@@ -165,41 +177,6 @@
     },
     {
       "parameters": {
-        "options": {
-          "allowFileUploads": true
-        }
-      },
-      "id": "29eedbf1-80e6-461d-921f-e60cf8a1c0c5",
-      "name": "When chat message received",
-      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        680,
-        520
-      ],
-      "webhookId": "a5102fff-f946-4f69-b689-bf32ed5cf545"
-    },
-    {
-      "parameters": {
-        "agent": "conversationalAgent",
-        "promptType": "define",
-        "text": "={{ $('When chat message received').item.json.chatInput }}",
-        "options": {
-          "systemMessage": "={{ $json.sessionId }}"
-        }
-      },
-      "id": "5e1b6397-bf71-4fd1-a170-18ef7b41fc04",
-      "name": "AI Agent",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1.6,
-      "position": [
-        1420,
-        440
-      ],
-      "executeOnce": true
-    },
-    {
-      "parameters": {
         "mode": "insert",
         "qdrantCollection": {
           "__rl": true,
@@ -224,6 +201,41 @@
           "name": "Local QdrantApi database"
         }
       }
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "={{ $json.metadata.sessionId }}"
+        }
+      },
+      "id": "5e1b6397-bf71-4fd1-a170-18ef7b41fc04",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        1420,
+        440
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "allowFileUploads": true
+        }
+      },
+      "id": "29eedbf1-80e6-461d-921f-e60cf8a1c0c5",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        520
+      ],
+      "webhookId": "a5102fff-f946-4f69-b689-bf32ed5cf545"
     }
   ],
   "pinData": {},
@@ -327,22 +339,22 @@
         ]
       ]
     },
-    "When chat message received": {
+    "Qdrant Vector Store": {
       "main": [
         [
           {
-            "node": "Qdrant Vector Store",
+            "node": "AI Agent",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Qdrant Vector Store": {
+    "When chat message received": {
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Qdrant Vector Store",
             "type": "main",
             "index": 0
           }
@@ -354,7 +366,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "fec54e00-6067-4ff0-b5be-06624ce35920",
+  "versionId": "e64c97c7-2e8c-4ead-8275-ef8b521c926d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
